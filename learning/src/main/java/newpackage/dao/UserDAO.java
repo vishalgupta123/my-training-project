@@ -1,0 +1,40 @@
+package newpackage.dao;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import newpackage.bean.User;
+
+public class UserDAO {
+	 public User checkLogin(String id, String password) throws SQLException,
+	    ClassNotFoundException {
+			String jdbcURL = "jdbc:oracle:thin:@//localhost:1521/orcl";
+			String dbUser = "sys as sysdba";
+			String dbPassword = "system";
+			
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			Connection connection = DriverManager.getConnection(jdbcURL, dbUser, dbPassword);
+			String sql = "SELECT * FROM userdetails WHERE id = ? and password = ?";
+			PreparedStatement statement = connection.prepareStatement(sql);
+			statement.setString(1, id);
+			statement.setString(2, password);
+			
+			ResultSet result = statement.executeQuery();
+			
+			User user = null;
+			
+			if (result.next()) {
+			    user = new User();
+			    user.setName(result.getString("name"));
+			    user.setId(id);
+			    user.setEmail(result.getString("email"));
+			}
+			
+			connection.close();
+			
+			return user;
+		}
+}
